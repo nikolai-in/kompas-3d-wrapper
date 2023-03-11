@@ -1,0 +1,19 @@
+{
+  "cSpell.words": [
+    "autobuild",
+    "bindir",
+    "bindirs",
+    "darglint",
+    "docstrings",
+    "furo",
+    "hookdir",
+    "kompas",
+    "modname",
+    "noxfile",
+    "posargs",
+    "precommit",
+    "pyupgrade",
+    "xdoctest"
+  ],
+  "python.formatting.provider": "black"
+}

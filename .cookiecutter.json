@@ -1,0 +1,14 @@
+{
+  "_output_dir": "/mnt/c/Users/tameddev/Developer",
+  "_template": "gh:cjolowicz/cookiecutter-hypermodern-python",
+  "author": "Nick",
+  "copyright_year": "2023",
+  "development_status": "Development Status :: 2 - Pre-Alpha",
+  "email": "nikolai.in@tuta.io",
+  "friendly_name": "Kompas 3D Wrapper",
+  "github_user": "nikolai-in",
+  "license": "MIT",
+  "package_name": "kompas_3d_wrapper",
+  "project_name": "kompas-3d-wrapper",
+  "version": "2023.3.11"
+}
