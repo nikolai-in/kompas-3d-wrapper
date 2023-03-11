@@ -21,6 +21,7 @@
     "pyright",
     "pythonwin",
     "pyupgrade",
+    "pywin",
     "xdoctest"
   ],
   "python.formatting.provider": "black",
