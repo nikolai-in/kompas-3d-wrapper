@@ -21,6 +21,14 @@ def import_kompas_ldefin2d_mischelpers(kompas_pythonwin: str) -> tuple:
 
     sys.path.append(kompas_pythonwin)
 
+    # Test if MiscellaneousHelpers and LDefin2D already exist in the sys.modules
+    if "MiscellaneousHelpers" in sys.modules:
+        # If the MiscellaneousHelpers module already exists, remove it
+        del sys.modules["MiscellaneousHelpers"]
+    if "LDefin2D" in sys.modules:
+        # If the LDefin2D module already exists remove it
+        del sys.modules["LDefin2D"]
+
     try:
         # Import LDefin2D and MiscellaneousHelpers as miscHelpers modules
         import LDefin2D  # pyright: reportMissingImports=false
