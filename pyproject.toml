@@ -18,6 +18,7 @@ Changelog = "https://github.com/nikolai-in/kompas-3d-wrapper/releases"
 [tool.poetry.dependencies]
 python = "^3.7"
 click = ">=8.0.1"
+pywin32 = "^305"
 
 [tool.poetry.dev-dependencies]
 Pygments = ">=2.10.0"
