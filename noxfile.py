@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 from textwrap import dedent
 
-import nox
+import nox  # pyright: reportMissingImports=false
 
 
 try:

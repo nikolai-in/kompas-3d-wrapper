@@ -12,6 +12,7 @@
     "noxfile",
     "posargs",
     "precommit",
+    "pyright",
     "pyupgrade",
     "xdoctest"
   ],
