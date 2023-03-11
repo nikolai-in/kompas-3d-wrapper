@@ -3,7 +3,6 @@ import sys
 from os import path
 
 import click
-import pythoncom  # noqa: F401
 
 
 KOMPAS_21_STUDY = r"C:\Program Files\ASCON\KOMPAS-3D v21 Study\Bin\kStudy.exe"
@@ -12,7 +11,7 @@ KOMPAS_21_PYTHONWIN = (
 )
 
 
-def import_kompas_ldefin2d_and_mischelpers(kompas_pythonwin: str) -> tuple:
+def import_kompas_ldefin2d_mischelpers(kompas_pythonwin: str) -> tuple:
     """Import Kompas LDefin2D and miscHelpers modules."""
     # Check if the kompas_pythonwin path exists, otherwise raise FileNotFoundError
     if not path.exists(kompas_pythonwin):
@@ -43,7 +42,7 @@ def import_kompas_ldefin2d_and_mischelpers(kompas_pythonwin: str) -> tuple:
 @click.version_option()
 def main() -> None:
     """Kompas 3D Wrapper."""
-    ldefin2d, misc_helpers = import_kompas_ldefin2d_and_mischelpers(KOMPAS_21_PYTHONWIN)
+    ldefin2d, misc_helpers = import_kompas_ldefin2d_mischelpers(KOMPAS_21_PYTHONWIN)
     print(type(ldefin2d))
     print(type(misc_helpers))
 

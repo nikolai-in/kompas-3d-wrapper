@@ -7,6 +7,7 @@
     "darglint",
     "Defin",
     "docstrings",
+    "excinfo",
     "furo",
     "hookdir",
     "kompas",
@@ -22,5 +23,8 @@
     "pyupgrade",
     "xdoctest"
   ],
-  "python.formatting.provider": "black"
+  "python.formatting.provider": "black",
+  "python.testing.pytestArgs": ["tests"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
 }
