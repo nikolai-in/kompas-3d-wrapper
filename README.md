@@ -34,17 +34,8 @@
 You can install _Kompas 3D Wrapper_ via [pip] from [PyPI]:
 
 ```console
-$ pip install kompas-3d-wrapper
+pip install kompas-3d-wrapper
 ```
-
-## Usage
-
-Please see the [Command-line Reference] for details.
-
-## Contributing
-
-Contributions are very welcome.
-To learn more, see the [Contributor Guide].
 
 ## License
 
@@ -69,5 +60,3 @@ This project was generated from [@cjolowicz]'s [Hypermodern Python Cookiecutter]
 <!-- github-only -->
 
 [license]: https://github.com/nikolai-in/kompas-3d-wrapper/blob/main/LICENSE
-[contributor guide]: https://github.com/nikolai-in/kompas-3d-wrapper/blob/main/CONTRIBUTING.md
-[command-line reference]: https://kompas-3d-wrapper.readthedocs.io/en/latest/usage.html
