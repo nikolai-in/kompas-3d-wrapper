@@ -8,22 +8,20 @@ readme = "README.md"
 homepage = "https://github.com/nikolai-in/kompas-3d-wrapper"
 repository = "https://github.com/nikolai-in/kompas-3d-wrapper"
 documentation = "https://kompas-3d-wrapper.readthedocs.io"
-classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
-]
+classifiers = ["Development Status :: 2 - Pre-Alpha"]
 
 [tool.poetry.urls]
 Changelog = "https://github.com/nikolai-in/kompas-3d-wrapper/releases"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.11"
 click = ">=8.0.1"
 pywin32 = "^305"
 
 [tool.poetry.dev-dependencies]
 Pygments = ">=2.10.0"
 black = ">=21.10b0"
-coverage = {extras = ["toml"], version = ">=6.2"}
+coverage = { extras = ["toml"], version = ">=6.2" }
 darglint = ">=1.8.1"
 flake8 = ">=4.0.1"
 flake8-bandit = ">=2.1.2"
@@ -43,8 +41,8 @@ sphinx = ">=4.3.2"
 sphinx-autobuild = ">=2021.3.14"
 sphinx-click = ">=3.0.2"
 typeguard = ">=2.13.3"
-xdoctest = {extras = ["colors"], version = ">=0.15.10"}
-myst-parser = {version = ">=0.16.1"}
+xdoctest = { extras = ["colors"], version = ">=0.15.10" }
+myst-parser = { version = ">=0.16.1" }
 
 [tool.poetry.scripts]
 kompas-3d-wrapper = "kompas_3d_wrapper.__main__:main"
@@ -73,6 +71,7 @@ pretty = true
 show_column_numbers = true
 show_error_codes = true
 show_error_context = true
+ignore_missing_imports = true
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

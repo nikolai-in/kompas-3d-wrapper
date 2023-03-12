@@ -1,6 +1,7 @@
 """Command-line interface."""
 import sys
 from os import path
+from types import ModuleType
 
 import click
 
@@ -11,7 +12,9 @@ KOMPAS_21_PYTHONWIN = (
 )
 
 
-def import_kompas_ldefin2d_mischelpers(kompas_pythonwin: str) -> tuple:
+def import_kompas_ldefin2d_mischelpers(
+    kompas_pythonwin: str,
+) -> tuple[ModuleType, ModuleType]:
     """Import Kompas LDefin2D and miscHelpers modules."""
     # Check if the kompas_pythonwin path exists, otherwise raise FileNotFoundError
     if not path.exists(kompas_pythonwin):
