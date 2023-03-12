@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "kompas-3d-wrapper"
-version = "2023.3.11"
+version = "2023.3.12"
 description = "Kompas 3D Wrapper"
 authors = ["Nick <nikolai.in@tuta.io>"]
 license = "MIT"
