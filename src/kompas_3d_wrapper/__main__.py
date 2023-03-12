@@ -57,34 +57,44 @@ def import_kompas_ldefin2d_mischelpers(
 
 def get_kompas_api7() -> tuple[any, type, ModuleType]:
     """Get KOMPAS-3D COM API version 7."""
-    module = gencache.EnsureModule(  # type: ignore
-        "{69AC2981-37C0-4379-84FD-5DD2F3C0A520}", 0, 1, 0
-    )
-    api = module.IKompasAPIObject(
-        Dispatch("Kompas.Application.7")._oleobj_.QueryInterface(
-            module.IKompasAPIObject.CLSID, pythoncom.IID_IDispatch
+    try:
+        module = gencache.EnsureModule(
+            "{69AC2981-37C0-4379-84FD-5DD2F3C0A520}", 0, 1, 0
         )
-    )
-    const = gencache.EnsureModule(  # type: ignore
-        "{75C9F5D0-B5B8-4526-8681-9903C567D2ED}", 0, 1, 0
-    ).constants
-    return module, api, const
+        api = module.IKompasAPIObject(
+            Dispatch("Kompas.Application.7")._oleobj_.QueryInterface(
+                module.IKompasAPIObject.CLSID, pythoncom.IID_IDispatch
+            )
+        )
+        const = gencache.EnsureModule(
+            "{75C9F5D0-B5B8-4526-8681-9903C567D2ED}", 0, 1, 0
+        ).constants
+        return module, api, const
+    except Exception as e:
+        raise Exception(
+            "Failed to get Kompas COM API version 7: " + str(e)
+        ) from Exception
 
 
 def get_kompas_api5() -> tuple[any, type, ModuleType]:
     """Get KOMPAS-3D COM API version 5."""
-    module = gencache.EnsureModule(  # type: ignore
-        "{0422828C-F174-495E-AC5D-D31014DBBE87}", 0, 1, 0
-    )
-    api = module.IKompasAPIObject(
-        Dispatch("Kompas.Application.5")._oleobj_.QueryInterface(
-            module.IKompasAPIObject.CLSID, pythoncom.IID_IDispatch
+    try:
+        module = gencache.EnsureModule(
+            "{0422828C-F174-495E-AC5D-D31014DBBE87}", 0, 1, 0
         )
-    )
-    const = gencache.EnsureModule(  # type: ignore
-        "{75C9F5D0-B5B8-4526-8681-9903C567D2ED}", 0, 1, 0
-    ).constants
-    return module, api, const
+        api = module.IKompasAPIObject(
+            Dispatch("Kompas.Application.5")._oleobj_.QueryInterface(
+                module.IKompasAPIObject.CLSID, pythoncom.IID_IDispatch
+            )
+        )
+        const = gencache.EnsureModule(
+            "{75C9F5D0-B5B8-4526-8681-9903C567D2ED}", 0, 1, 0
+        ).constants
+        return module, api, const
+    except Exception as e:
+        raise Exception(
+            "Failed to get Kompas COM API version 5: " + str(e)
+        ) from Exception
 
 
 def start_kompas_if_not_running() -> bool:
@@ -94,7 +104,7 @@ def start_kompas_if_not_running() -> bool:
         bool: True if KOMPAS-3D is running, False otherwise.
     """
     try:
-        proc_list = subprocess.check_output(  # noqa: S603, S607
+        proc_list = subprocess.check_output(  # noqa: S607, S603
             ["tasklist", "/NH", "/FI", f"IMAGENAME eq {KOMPAS_21_EXECUTABLE}"]
         ).decode()
         if "No tasks are running" in proc_list:
@@ -103,8 +113,11 @@ def start_kompas_if_not_running() -> bool:
         else:
             return True
     except subprocess.CalledProcessError as e:
-        print(f"Error occurred: {e}")
-        return False
+        print(f"Error occurred while checking for KOMPAS-3D process: {e}")
+        raise Exception("Error occurred while checking for KOMPAS-3D process") from e
+    except Exception as e:
+        print(f"Unexpected error occurred: {e}")
+        raise e from e
 
 
 @click.command()
