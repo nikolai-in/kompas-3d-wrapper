@@ -122,28 +122,29 @@ def start_kompas(kompas_exe_path: str) -> bool:
 @click.version_option()
 def main() -> None:
     """Kompas 3D Wrapper."""
-    if path.exists(KOMPAS_21_PYTHONWIN):
-        try:
-            is_running: bool = not start_kompas(
-                path.join(KOMPAS_21_DIR, KOMPAS_21_EXECUTABLE)
-            )
-
-            time.sleep(5)
-
-            module7, api7, const7 = get_kompas_api7()  # Подключаемся к API7
-            app7 = api7.Application  # Получаем основной интерфейс
-            app7.Visible = True  # Показываем окно пользователю (если скрыто)
-            app7.HideMessage = (
-                const7.ksHideMessageNo  # Отвечаем НЕТ на любые вопросы программы
-            )
-            print(f"Application Name: {app7.ApplicationName(FullName=True)}")
-
-            if not is_running:
-                app7.Quit()
-        except Exception as e:
-            print(f"Error occurred: {e}")
-    else:
+    if not path.exists(KOMPAS_21_PYTHONWIN):
         print("Kompas 3D not found. Please install Kompas 3D with macro support.")
+        return
+
+    try:
+        is_running: bool = not start_kompas(
+            path.join(KOMPAS_21_DIR, KOMPAS_21_EXECUTABLE)
+        )
+
+        time.sleep(5)
+
+        module7, api7, const7 = get_kompas_api7()
+        app7 = api7.Application
+        app7.Visible = True
+        app7.HideMessage = const7.ksHideMessageNo
+
+        print(f"Application Name: {app7.ApplicationName(FullName=True)}")
+
+        if not is_running:
+            app7.Quit()
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
 
 
 if __name__ == "__main__":
