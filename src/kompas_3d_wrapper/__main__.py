@@ -97,25 +97,25 @@ def get_kompas_api5() -> tuple[any, type, ModuleType]:
         ) from Exception
 
 
-def start_kompas_if_not_running() -> bool:
-    """Check if KOMPAS-3D is running and lunch it if not.
+def start_kompas_if_not_running(kompas_bin_dir: str, kompas_exe: str) -> bool:
+    """Check if KOMPAS-3D is running and launch it if not.
 
     Returns:
         bool: True if KOMPAS-3D is running, False otherwise.
     """
     try:
-        proc_list = subprocess.check_output(  # noqa: S607, S603
-            ["tasklist", "/NH", "/FI", f"IMAGENAME eq {KOMPAS_21_EXECUTABLE}"]
+        proc_list = subprocess.check_output(  # noqa: S603, S607
+            ["tasklist", "/NH", "/FI", f"IMAGENAME eq {kompas_exe}"]
         ).decode()
-        if "No tasks are running" in proc_list:
-            subprocess.Popen(KOMPAS_21_DIR + r"\\" + KOMPAS_21_EXECUTABLE)  # noqa: S603
-            return False
-        else:
+        if kompas_exe in proc_list:
             return True
+        else:
+            subprocess.Popen(f"{kompas_bin_dir}\\{kompas_exe}")  # noqa: S603
+            return False
     except subprocess.CalledProcessError as e:
         print(f"Error occurred while checking for KOMPAS-3D process: {e}")
         raise Exception("Error occurred while checking for KOMPAS-3D process") from e
-    except Exception as e:
+    except subprocess.SubprocessError as e:
         print(f"Unexpected error occurred: {e}")
         raise e from e
 
@@ -126,7 +126,9 @@ def main() -> None:
     """Kompas 3D Wrapper."""
     if path.exists(KOMPAS_21_PYTHONWIN):
         try:
-            is_running: bool = start_kompas_if_not_running()
+            is_running: bool = start_kompas_if_not_running(
+                KOMPAS_21_DIR, KOMPAS_21_EXECUTABLE
+            )
 
             time.sleep(5)
 

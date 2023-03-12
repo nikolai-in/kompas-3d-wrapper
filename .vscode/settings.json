@@ -25,6 +25,7 @@
     "pipx",
     "posargs",
     "precommit",
+    "psutil",
     "pyright",
     "pythoncom",
     "pythonwin",
