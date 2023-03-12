@@ -53,9 +53,12 @@ def import_kompas_ldefin2d_mischelpers(
 @click.version_option()
 def main() -> None:
     """Kompas 3D Wrapper."""
-    ldefin2d, misc_helpers = import_kompas_ldefin2d_mischelpers(KOMPAS_21_PYTHONWIN)
-    print(type(ldefin2d))
-    print(type(misc_helpers))
+    if path.exists(KOMPAS_21_PYTHONWIN):
+        ldefin2d, misc_helpers = import_kompas_ldefin2d_mischelpers(KOMPAS_21_PYTHONWIN)
+        print(type(ldefin2d))
+        print(type(misc_helpers))
+    else:
+        print("Kompas 3D not found. Please install Kompas 3D with macro support.")
 
 
 if __name__ == "__main__":
