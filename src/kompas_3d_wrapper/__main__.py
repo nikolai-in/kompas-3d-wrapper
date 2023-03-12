@@ -6,6 +6,7 @@ from os import path
 from types import ModuleType
 
 import click
+import psutil
 import pythoncom
 from win32com.client import Dispatch
 from win32com.client import gencache
@@ -97,27 +98,24 @@ def get_kompas_api5() -> tuple[any, type, ModuleType]:
         ) from Exception
 
 
-def start_kompas_if_not_running(kompas_bin_dir: str, kompas_exe: str) -> bool:
-    """Check if KOMPAS-3D is running and launch it if not.
+def is_process_running(process_name: str) -> bool:
+    """Check if a process with a given name is currently running."""
+    for proc in psutil.process_iter():
+        try:
+            if proc.name() == process_name:
+                return True
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            pass
+    return False
 
-    Returns:
-        bool: True if KOMPAS-3D is running, False otherwise.
-    """
-    try:
-        proc_list = subprocess.check_output(  # noqa: S603, S607
-            ["tasklist", "/NH", "/FI", f"IMAGENAME eq {kompas_exe}"]
-        ).decode()
-        if kompas_exe in proc_list:
-            return True
-        else:
-            subprocess.Popen(f"{kompas_bin_dir}\\{kompas_exe}")  # noqa: S603
-            return False
-    except subprocess.CalledProcessError as e:
-        print(f"Error occurred while checking for KOMPAS-3D process: {e}")
-        raise Exception("Error occurred while checking for KOMPAS-3D process") from e
-    except subprocess.SubprocessError as e:
-        print(f"Unexpected error occurred: {e}")
-        raise e from e
+
+def start_kompas(kompas_exe_path: str) -> bool:
+    """Start KOMPAS-3D if it's not already running."""
+    if is_process_running(path.basename(kompas_exe_path)):
+        return False
+
+    subprocess.Popen(kompas_exe_path)  # noqa: S603
+    return True
 
 
 @click.command()
@@ -126,8 +124,8 @@ def main() -> None:
     """Kompas 3D Wrapper."""
     if path.exists(KOMPAS_21_PYTHONWIN):
         try:
-            is_running: bool = start_kompas_if_not_running(
-                KOMPAS_21_DIR, KOMPAS_21_EXECUTABLE
+            is_running: bool = not start_kompas(
+                path.join(KOMPAS_21_DIR, KOMPAS_21_EXECUTABLE)
             )
 
             time.sleep(5)
