@@ -11,7 +11,8 @@ from win32com.client import Dispatch
 from win32com.client import gencache
 
 
-KOMPAS_21_STUDY = r"C:\Program Files\ASCON\KOMPAS-3D v21 Study\Bin\kStudy.exe"
+KOMPAS_21_DIR = r"C:\Program Files\ASCON\KOMPAS-3D v21 Study\Bin"
+KOMPAS_21_EXECUTABLE = "kStudy.exe"
 KOMPAS_21_PYTHONWIN = (
     r"C:\ProgramData\ASCON\KOMPAS-3D\21\Python 3\App\Lib\site-packages\pythonwin"
 )
@@ -94,12 +95,10 @@ def start_kompas_if_not_running() -> bool:
     """
     try:
         proc_list = subprocess.check_output(  # noqa: S603, S607
-            ["tasklist", "/NH", "/FI", "IMAGENAME eq kStudy.exe"]
+            ["tasklist", "/NH", "/FI", f"IMAGENAME eq {KOMPAS_21_EXECUTABLE}"]
         ).decode()
         if "No tasks are running" in proc_list:
-            subprocess.Popen(  # noqa: S603
-                r"C:\Program Files\ASCON\KOMPAS-3D v21 Study\Bin\kStudy.exe"
-            )
+            subprocess.Popen(KOMPAS_21_DIR + r"\\" + KOMPAS_21_EXECUTABLE)  # noqa: S603
             return False
         else:
             return True
