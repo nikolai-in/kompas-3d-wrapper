@@ -1,9 +1,14 @@
 """Command-line interface."""
+import subprocess  # noqa: S404
 import sys
+import time
 from os import path
 from types import ModuleType
 
 import click
+import pythoncom
+from win32com.client import Dispatch
+from win32com.client import gencache
 
 
 KOMPAS_21_STUDY = r"C:\Program Files\ASCON\KOMPAS-3D v21 Study\Bin\kStudy.exe"
@@ -49,14 +54,82 @@ def import_kompas_ldefin2d_mischelpers(
     return LDefin2D, miscHelpers
 
 
+def get_kompas_api7() -> tuple[any, type, ModuleType]:
+    """Get KOMPAS-3D COM API version 7."""
+    module = gencache.EnsureModule(  # type: ignore
+        "{69AC2981-37C0-4379-84FD-5DD2F3C0A520}", 0, 1, 0
+    )
+    api = module.IKompasAPIObject(
+        Dispatch("Kompas.Application.7")._oleobj_.QueryInterface(
+            module.IKompasAPIObject.CLSID, pythoncom.IID_IDispatch
+        )
+    )
+    const = gencache.EnsureModule(  # type: ignore
+        "{75C9F5D0-B5B8-4526-8681-9903C567D2ED}", 0, 1, 0
+    ).constants
+    return module, api, const
+
+
+def get_kompas_api5() -> tuple[any, type, ModuleType]:
+    """Get KOMPAS-3D COM API version 5."""
+    module = gencache.EnsureModule(  # type: ignore
+        "{0422828C-F174-495E-AC5D-D31014DBBE87}", 0, 1, 0
+    )
+    api = module.IKompasAPIObject(
+        Dispatch("Kompas.Application.5")._oleobj_.QueryInterface(
+            module.IKompasAPIObject.CLSID, pythoncom.IID_IDispatch
+        )
+    )
+    const = gencache.EnsureModule(  # type: ignore
+        "{75C9F5D0-B5B8-4526-8681-9903C567D2ED}", 0, 1, 0
+    ).constants
+    return module, api, const
+
+
+def start_kompas_if_not_running() -> bool:
+    """Check if KOMPAS-3D is running and lunch it if not.
+
+    Returns:
+        bool: True if KOMPAS-3D is running, False otherwise.
+    """
+    try:
+        proc_list = subprocess.check_output(  # noqa: S603, S607
+            ["tasklist", "/NH", "/FI", "IMAGENAME eq kStudy.exe"]
+        ).decode()
+        if "No tasks are running" in proc_list:
+            subprocess.Popen(  # noqa: S603
+                r"C:\Program Files\ASCON\KOMPAS-3D v21 Study\Bin\kStudy.exe"
+            )
+            return False
+        else:
+            return True
+    except subprocess.CalledProcessError as e:
+        print(f"Error occurred: {e}")
+        return False
+
+
 @click.command()
 @click.version_option()
 def main() -> None:
     """Kompas 3D Wrapper."""
     if path.exists(KOMPAS_21_PYTHONWIN):
-        ldefin2d, misc_helpers = import_kompas_ldefin2d_mischelpers(KOMPAS_21_PYTHONWIN)
-        print(type(ldefin2d))
-        print(type(misc_helpers))
+        try:
+            is_running: bool = start_kompas_if_not_running()
+
+            time.sleep(5)
+
+            module7, api7, const7 = get_kompas_api7()  # Подключаемся к API7
+            app7 = api7.Application  # Получаем основной интерфейс
+            app7.Visible = True  # Показываем окно пользователю (если скрыто)
+            app7.HideMessage = (
+                const7.ksHideMessageNo  # Отвечаем НЕТ на любые вопросы программы
+            )
+            print(f"Application Name: {app7.ApplicationName(FullName=True)}")
+
+            if not is_running:
+                app7.Quit()
+        except Exception as e:
+            print(f"Error occurred: {e}")
     else:
         print("Kompas 3D not found. Please install Kompas 3D with macro support.")
 
