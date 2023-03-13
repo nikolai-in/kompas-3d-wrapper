@@ -58,6 +58,17 @@ def get_kompas_constants() -> ModuleType:
         raise Exception("Failed to get Kompas constants: " + str(e)) from Exception
 
 
+def get_kompas_constants_3d() -> ModuleType:
+    """Get KOMPAS-3D constants."""
+    try:
+        constants = gencache.EnsureModule(
+            "{2CAF168C-7961-4B90-9DA2-701419BEEFE3}", 0, 1, 0
+        ).constants
+        return constants
+    except Exception as e:
+        raise Exception("Failed to get Kompas constants 3d: " + str(e)) from Exception
+
+
 def get_kompas_api7() -> tuple[any, type]:
     """Get KOMPAS-3D COM API version 7."""
     try:
@@ -82,9 +93,9 @@ def get_kompas_api5() -> tuple[any, type]:
         module = gencache.EnsureModule(
             "{0422828C-F174-495E-AC5D-D31014DBBE87}", 0, 1, 0
         )
-        api = module.IKompasAPIObject(
+        api = module.KompasObject(
             Dispatch("Kompas.Application.5")._oleobj_.QueryInterface(
-                module.IKompasAPIObject.CLSID, pythoncom.IID_IDispatch
+                module.KompasObject.CLSID, pythoncom.IID_IDispatch
             )
         )
         return module, api
@@ -108,7 +119,7 @@ def is_process_running(process_name: str) -> bool:
 def start_kompas(kompas_exe_path: str) -> bool:
     """Start KOMPAS-3D if it's not already running."""
     if is_process_running(path.basename(kompas_exe_path)):
-        return False
+        return True
 
     subprocess.Popen(kompas_exe_path)  # noqa: S603
-    return True
+    return False

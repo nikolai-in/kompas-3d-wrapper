@@ -25,17 +25,15 @@ def main() -> None:
         return
 
     try:
-        is_running: bool = not start_kompas(
-            path.join(KOMPAS_21_DIR, KOMPAS_21_EXECUTABLE)
-        )
+        is_running: bool = start_kompas(path.join(KOMPAS_21_DIR, KOMPAS_21_EXECUTABLE))
 
         time.sleep(5)
 
         module7, api7 = get_kompas_api7()
-        const7 = get_kompas_constants()
+        const = get_kompas_constants()
         app7 = api7.Application
         app7.Visible = True
-        app7.HideMessage = const7.ksHideMessageNo
+        app7.HideMessage = const.ksHideMessageNo
 
         print(f"Application Name: {app7.ApplicationName(FullName=True)}")
 
