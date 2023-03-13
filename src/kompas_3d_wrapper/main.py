@@ -47,7 +47,18 @@ def import_kompas_ldefin2d_mischelpers(
     return LDefin2D, miscHelpers
 
 
-def get_kompas_api7() -> tuple[any, type, ModuleType]:
+def get_kompas_constants() -> ModuleType:
+    """Get KOMPAS-3D constants."""
+    try:
+        constants = gencache.EnsureModule(
+            "{75C9F5D0-B5B8-4526-8681-9903C567D2ED}", 0, 1, 0
+        ).constants
+        return constants
+    except Exception as e:
+        raise Exception("Failed to get Kompas constants: " + str(e)) from Exception
+
+
+def get_kompas_api7() -> tuple[any, type]:
     """Get KOMPAS-3D COM API version 7."""
     try:
         module = gencache.EnsureModule(
@@ -58,17 +69,14 @@ def get_kompas_api7() -> tuple[any, type, ModuleType]:
                 module.IKompasAPIObject.CLSID, pythoncom.IID_IDispatch
             )
         )
-        const = gencache.EnsureModule(
-            "{75C9F5D0-B5B8-4526-8681-9903C567D2ED}", 0, 1, 0
-        ).constants
-        return module, api, const
+        return module, api
     except Exception as e:
         raise Exception(
             "Failed to get Kompas COM API version 7: " + str(e)
         ) from Exception
 
 
-def get_kompas_api5() -> tuple[any, type, ModuleType]:
+def get_kompas_api5() -> tuple[any, type]:
     """Get KOMPAS-3D COM API version 5."""
     try:
         module = gencache.EnsureModule(
@@ -79,10 +87,7 @@ def get_kompas_api5() -> tuple[any, type, ModuleType]:
                 module.IKompasAPIObject.CLSID, pythoncom.IID_IDispatch
             )
         )
-        const = gencache.EnsureModule(
-            "{75C9F5D0-B5B8-4526-8681-9903C567D2ED}", 0, 1, 0
-        ).constants
-        return module, api, const
+        return module, api
     except Exception as e:
         raise Exception(
             "Failed to get Kompas COM API version 5: " + str(e)
