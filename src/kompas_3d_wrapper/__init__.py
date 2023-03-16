@@ -9,11 +9,11 @@ from kompas_3d_wrapper.main import start_kompas
 
 
 __all__ = [
-    "import_ldefin2d_mischelpers",
-    "start_kompas",
     "get_kompas_api5",
     "get_kompas_api7",
     "get_kompas_constants",
-    "get_pythonwin_path",
     "get_kompas_path",
+    "get_pythonwin_path",
+    "import_ldefin2d_mischelpers",
+    "start_kompas",
 ]
