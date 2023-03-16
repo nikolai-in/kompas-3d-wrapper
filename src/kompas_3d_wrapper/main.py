@@ -143,13 +143,50 @@ def import_ldefin2d_mischelpers(
     return LDefin2D, miscHelpers
 
 
+kompas_path = find_exe_by_file_extension(".cdw")
+
+
+def is_process_running(process_name: str = kompas_path) -> bool:
+    """Check if a process with a given name is currently running."""
+    for proc in psutil.process_iter():
+        try:
+            if proc.name() == process_name:
+                logging.debug(f"Process {process_name} is running")
+                return True
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            pass
+    logging.debug(f"Process {process_name} is not running")
+    return False
+
+
+def start_kompas(kompas_exe_path: str = kompas_path) -> bool:
+    """Start KOMPAS-3D if it's not already running."""
+    if is_process_running(path.basename(kompas_exe_path)):
+        return True
+
+    subprocess.Popen(kompas_exe_path)  # noqa: S603
+    logging.debug(f"Started Kompas at {kompas_exe_path}")
+    return False
+
+
 def get_kompas_constants() -> ModuleType:
-    """Get KOMPAS-3D constants."""
+    """Импортирует модуль constants КОМПАС-3D.
+
+    Returns:
+        ModuleType: Модуль constants КОМПАС-3D
+
+    Raises:
+        Exception: Если не удалось импортировать модуль constants КОМПАС-3D
+
+    Example:
+        >>> constants = get_kompas_constants()
+        >>> assert 'etSuccess' in dir(constants)
+    """
     try:
         constants = gencache.EnsureModule(
             "{75C9F5D0-B5B8-4526-8681-9903C567D2ED}", 0, 1, 0
         ).constants
-        return constants
+        return constants  # Я не знаю как, но оно работает, даже если компас не запущен
     except Exception as e:
         raise Exception("Failed to get Kompas constants: " + str(e)) from Exception
 
@@ -199,26 +236,3 @@ def get_kompas_api5() -> tuple[any, type]:
         raise Exception(
             "Failed to get Kompas COM API version 5: " + str(e)
         ) from Exception
-
-
-def is_process_running(process_name: str) -> bool:
-    """Check if a process with a given name is currently running."""
-    for proc in psutil.process_iter():
-        try:
-            if proc.name() == process_name:
-                logging.debug(f"Process {process_name} is running")
-                return True
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
-            pass
-    logging.debug(f"Process {process_name} is not running")
-    return False
-
-
-def start_kompas(kompas_exe_path: str) -> bool:
-    """Start KOMPAS-3D if it's not already running."""
-    if is_process_running(path.basename(kompas_exe_path)):
-        return True
-
-    subprocess.Popen(kompas_exe_path)  # noqa: S603
-    logging.debug(f"Started Kompas at {kompas_exe_path}")
-    return False
