@@ -225,7 +225,7 @@ def start_kompas(kompas_exe_path: str = kompas_path) -> bool:
 
 
 def get_kompas_constants() -> ModuleType:
-    """Импортирует модуль constants КОМПАС-3D.
+    """Возвращает модуль constants КОМПАС-3D.
 
     Перед получением констант лучше запустить КОМПАС-3D,
     используйте функцию start_kompas() для этого.
@@ -255,18 +255,29 @@ def get_kompas_constants() -> ModuleType:
         ).constants
         return constants  # Я не знаю как, но оно работает, даже если компас не запущен
     except Exception as e:
-        raise Exception("Failed to get Kompas constants: " + str(e)) from e
+        raise Exception("Не удалось получить константы КОМПАС-3D: " + str(e)) from e
 
 
 def get_kompas_constants_3d() -> ModuleType:
-    """Get KOMPAS-3D constants."""
+    """Возвращает модуль constants_3d КОМПАС-3D.
+
+    Returns:
+        ModuleType: Модуль constants_3d КОМПАС-3D
+
+    Raises:
+        Exception: Если не удалось получить модуль constants_3d КОМПАС-3D
+
+    Example:
+        >>> const_3d = get_kompas_constants_3d()
+        >>> assert const_3d
+    """
     try:
         constants = gencache.EnsureModule(
             "{2CAF168C-7961-4B90-9DA2-701419BEEFE3}", 0, 1, 0
         ).constants
         return constants
     except Exception as e:
-        raise Exception("Failed to get Kompas constants 3d: " + str(e)) from e
+        raise Exception(f"Не удалось получить константы 3d КОМПАС-3D: {e!r}") from e
 
 
 def get_kompas_api7() -> tuple[any, type]:
@@ -280,6 +291,15 @@ def get_kompas_api7() -> tuple[any, type]:
 
     Raises:
         Exception: Если не удалось получить API КОМПАС-3D версии 7
+
+    Example:
+        >>> import time
+        >>> was_running = start_kompas() # Запускаем КОМПАС-3D
+        >>> if not was_running:
+        >>>    time.sleep(5) # Ждём, пока КОМПАС-3D запустится
+        >>>    module7, api7 = get_kompas_api7()
+        >>>    app7 = api7.Application
+        >>>    app7.Quit() # Закрываем КОМПАС-3D
     """
     try:
         module = gencache.EnsureModule(
@@ -296,7 +316,25 @@ def get_kompas_api7() -> tuple[any, type]:
 
 
 def get_kompas_api5() -> tuple[any, type]:
-    """Get KOMPAS-3D COM API version 5."""
+    """Получает COM API КОМПАС-3D версии 5.
+
+    Перед получением API необходимо запустить КОМПАС-3D,
+    используйте функцию start_kompas() для этого.
+
+    Returns:
+        tuple[any, type]: Модуль и API КОМПАС-3D версии 5
+
+    Raises:
+        Exception: Если не удалось получить API КОМПАС-3D версии 5
+
+    Example:
+        >>> import time
+        >>> was_running = start_kompas() # Запускаем КОМПАС-3D
+        >>> if not was_running:
+        >>>    time.sleep(5) # Ждём, пока КОМПАС-3D запустится
+        >>>    module5, api5 = get_kompas_api5()
+        >>>    api5.Quit() # Закрываем КОМПАС-3D
+    """
     try:
         module = gencache.EnsureModule(
             "{0422828C-F174-495E-AC5D-D31014DBBE87}", 0, 1, 0
