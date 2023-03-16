@@ -176,6 +176,10 @@ def is_process_running(process_name: str) -> bool:
 
     Returns:
         bool: True, если процесс запущен, иначе False
+
+    Example:
+        >>> explorer = is_process_running('explorer.exe')
+        >>> assert explorer != None
     """
     for proc in psutil.process_iter():
         try:
@@ -189,17 +193,42 @@ def is_process_running(process_name: str) -> bool:
 
 
 def start_kompas(kompas_exe_path: str = kompas_path) -> bool:
-    """Start KOMPAS-3D if it's not already running."""
+    """Запускает КОМПАС-3D, если он ещё не запущен.
+
+    Args:
+        kompas_exe_path (str, optional): Путь к исполняемому файлу КОМПАС-3D
+
+    Returns:
+        bool: True, если КОМПАС-3D уже был запущен, иначе False
+
+    Raises:
+        Exception: Если не удалось запустить КОМПАС-3D
+
+    Example:
+        >>> import time
+        >>> was_running = start_kompas() # Запускаем КОМПАС-3D
+        >>> if not was_running:
+        >>>    time.sleep(5) # Ждём, пока КОМПАС-3D запустится
+        >>>    _, api7 = get_kompas_api7()
+        >>>    app7 = api7.Application
+        >>>    app7.Quit() # Закрываем КОМПАС-3D
+    """
     if is_process_running(path.basename(kompas_exe_path)):
         return True
 
-    subprocess.Popen(kompas_exe_path)  # noqa: S603
-    logging.debug(f"Started Kompas at {kompas_exe_path}")
-    return False
+    try:
+        subprocess.Popen(kompas_exe_path)  # noqa: S603
+        logging.debug(f"Запустил компас из {kompas_exe_path!r}")
+        return False
+    except Exception as e:
+        raise Exception(f"Ошибка запуска КОМПАС-3D: {e!r}") from e
 
 
 def get_kompas_constants() -> ModuleType:
     """Импортирует модуль constants КОМПАС-3D.
+
+    Перед получением констант лучше запустить КОМПАС-3D,
+    используйте функцию start_kompas() для этого.
 
     Returns:
         ModuleType: Модуль constants КОМПАС-3D
@@ -208,8 +237,17 @@ def get_kompas_constants() -> ModuleType:
         Exception: Если не удалось импортировать модуль constants КОМПАС-3D
 
     Example:
-        >>> constants = get_kompas_constants()
-        >>> assert 'etSuccess' in dir(constants)
+        >>> import time
+        >>> was_running = start_kompas() # Запускаем КОМПАС-3D
+        >>> if not was_running:
+        >>>    time.sleep(5) # Ждём, пока КОМПАС-3D запустится
+        >>>    _, api7 = get_kompas_api7()
+        >>>    const = get_kompas_constants() # Получаем константы КОМПАС-3D
+        >>>    app7 = api7.Application
+        >>>
+        >>>    # Отвечаем НЕТ на любые вопросы программы
+        >>>    app7.HideMessage = const.ksHideMessageNo
+        >>>    app7.Quit() # Закрываем КОМПАС-3D
     """
     try:
         constants = gencache.EnsureModule(
@@ -217,7 +255,7 @@ def get_kompas_constants() -> ModuleType:
         ).constants
         return constants  # Я не знаю как, но оно работает, даже если компас не запущен
     except Exception as e:
-        raise Exception("Failed to get Kompas constants: " + str(e)) from Exception
+        raise Exception("Failed to get Kompas constants: " + str(e)) from e
 
 
 def get_kompas_constants_3d() -> ModuleType:
@@ -228,11 +266,21 @@ def get_kompas_constants_3d() -> ModuleType:
         ).constants
         return constants
     except Exception as e:
-        raise Exception("Failed to get Kompas constants 3d: " + str(e)) from Exception
+        raise Exception("Failed to get Kompas constants 3d: " + str(e)) from e
 
 
 def get_kompas_api7() -> tuple[any, type]:
-    """Get KOMPAS-3D COM API version 7."""
+    """Получает COM API КОМПАС-3D версии 7.
+
+    Перед получением API необходимо запустить КОМПАС-3D,
+    используйте функцию start_kompas() для этого.
+
+    Returns:
+        tuple[any, type]: Модуль и API КОМПАС-3D версии 7
+
+    Raises:
+        Exception: Если не удалось получить API КОМПАС-3D версии 7
+    """
     try:
         module = gencache.EnsureModule(
             "{69AC2981-37C0-4379-84FD-5DD2F3C0A520}", 0, 1, 0
@@ -244,9 +292,7 @@ def get_kompas_api7() -> tuple[any, type]:
         )
         return module, api
     except Exception as e:
-        raise Exception(
-            "Failed to get Kompas COM API version 7: " + str(e)
-        ) from Exception
+        raise Exception(f"Failed to get Kompas COM API version 7: {e!r}") from e
 
 
 def get_kompas_api5() -> tuple[any, type]:
