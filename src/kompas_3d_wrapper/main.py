@@ -92,7 +92,32 @@ def get_pythonwin_path() -> str:
     return pythonwin_path
 
 
+def get_kompas_path() -> str:
+    """Возвращает путь к исполняемому файлу КОМПАС-3D.
+
+    Returns:
+        str: Путь к исполняемому файлу КОМПАС-3D
+
+    Raises:
+        FileNotFoundError: Если не удалось найти исполняемый файл КОМПАС-3D
+
+    Example:
+        >>> kompas = get_kompas_path()
+        >>> assert 'KOMPAS-3D'in kompas
+    """
+    kompas_path = find_exe_by_file_extension(".cdw")
+
+    if "KOMPAS-3D" not in kompas_path:
+        raise FileNotFoundError("КОМПАС-3D с поддержкой макросов не установлен")
+
+    logging.debug(f"Компас: {kompas_path}")
+
+    return kompas_path
+
+
 pythonwin_path = get_pythonwin_path()
+
+kompas_path = get_kompas_path()
 
 
 def import_ldefin2d_mischelpers(
@@ -143,11 +168,15 @@ def import_ldefin2d_mischelpers(
     return LDefin2D, miscHelpers
 
 
-kompas_path = find_exe_by_file_extension(".cdw")
+def is_process_running(process_name: str) -> bool:
+    """Проверяет, запущен ли процесс с именем process_name.
 
+    Args:
+        process_name (str): Имя процесса
 
-def is_process_running(process_name: str = kompas_path) -> bool:
-    """Check if a process with a given name is currently running."""
+    Returns:
+        bool: True, если процесс запущен, иначе False
+    """
     for proc in psutil.process_iter():
         try:
             if proc.name() == process_name:

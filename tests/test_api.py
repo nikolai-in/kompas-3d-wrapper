@@ -1,6 +1,5 @@
 """Test kompas_3d_wrapper api."""
 import time
-from os import path
 
 from kompas_3d_wrapper import get_kompas_api5
 from kompas_3d_wrapper import get_kompas_api7
@@ -8,13 +7,9 @@ from kompas_3d_wrapper import get_kompas_constants
 from kompas_3d_wrapper import start_kompas
 
 
-KOMPAS_21_DIR = r"C:\Program Files\ASCON\KOMPAS-3D v21 Study\Bin"
-KOMPAS_21_EXECUTABLE = "kStudy.exe"
-
-
 def test_kompas_api7() -> None:
     """Test kompas api7."""
-    is_running: bool = start_kompas(path.join(KOMPAS_21_DIR, KOMPAS_21_EXECUTABLE))
+    is_running: bool = start_kompas()
 
     time.sleep(5)
 
@@ -37,7 +32,7 @@ def test_kompas_api7() -> None:
 
 def test_kompas_api5() -> None:
     """Test kompas api5."""
-    is_running: bool = start_kompas(path.join(KOMPAS_21_DIR, KOMPAS_21_EXECUTABLE))
+    is_running: bool = start_kompas()
 
     time.sleep(5)
 
