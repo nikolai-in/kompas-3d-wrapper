@@ -31,6 +31,7 @@
     "pythonwin",
     "pyupgrade",
     "pywin",
+    "scripter",
     "tasklist",
     "VIRTUALENV",
     "xdoctest"
