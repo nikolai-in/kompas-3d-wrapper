@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "kompas-3d-wrapper"
-version = "2023.3.13"
+version = "2023.3.16"
 description = "Kompas 3D Wrapper"
 authors = ["Nick <nikolai.in@tuta.io>"]
 license = "MIT"
@@ -8,7 +8,7 @@ readme = "README.md"
 homepage = "https://github.com/nikolai-in/kompas-3d-wrapper"
 repository = "https://github.com/nikolai-in/kompas-3d-wrapper"
 documentation = "https://kompas-3d-wrapper.readthedocs.io"
-classifiers = ["Development Status :: 2 - Pre-Alpha"]
+classifiers = ["Development Status :: 3 - Alpha"]
 
 [tool.poetry.urls]
 Changelog = "https://github.com/nikolai-in/kompas-3d-wrapper/releases"
