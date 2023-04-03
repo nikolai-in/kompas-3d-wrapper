@@ -1,20 +1,13 @@
 """Test kompas_3d_wrapper api."""
-import time
-
-from kompas_3d_wrapper import get_kompas_api5
-from kompas_3d_wrapper import get_kompas_api7
-from kompas_3d_wrapper import get_kompas_constants
-from kompas_3d_wrapper import start_kompas
+from kompas_3d_wrapper import Kompas
 
 
 def test_kompas_api7() -> None:
     """Test kompas api7."""
-    is_running: bool = start_kompas()
+    kompas = Kompas()
 
-    time.sleep(5)
-
-    const = get_kompas_constants()
-    _, api7 = get_kompas_api7()
+    const = kompas.constants
+    api7 = kompas.api7
 
     app7 = api7.Application
     app7.Visible = True
@@ -22,7 +15,7 @@ def test_kompas_api7() -> None:
 
     app_name = app7.ApplicationName(FullName=True)
 
-    if not is_running:
+    if not kompas.was_running:
         app7.Quit()
 
     assert (
@@ -32,17 +25,15 @@ def test_kompas_api7() -> None:
 
 def test_kompas_api5() -> None:
     """Test kompas api5."""
-    is_running: bool = start_kompas()
+    kompas = Kompas()
 
-    time.sleep(5)
-
-    _, api5 = get_kompas_api5()
+    _, api5 = kompas.get_kompas_api5()
 
     api7 = api5.ksGetApplication7()
 
     app_name = api7.ApplicationName(FullName=True)
 
-    if not is_running:
+    if not kompas.was_running:
         api5.Quit()
 
     assert (
