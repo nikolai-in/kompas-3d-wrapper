@@ -5,17 +5,76 @@ import subprocess  # noqa: S404
 import sys
 import winreg
 from os import path
+from time import sleep
 from types import ModuleType
 
 import psutil
 import pythoncom
+from pythoncom import com_error
 from win32com.client import Dispatch
 from win32com.client import gencache
-from pythoncom import com_error
-from time import sleep
 
 
-class k3d:
+def find_exe_by_file_extension(file_extension: str) -> str:
+    """Находит исполняемый файл по расширению файла.
+
+    Args:
+        file_extension (str): Расширение файла
+    Returns:
+        str: Путь к исполняемому файлу
+    Raises:
+        Exception: Если не удалось найти исполняемый файл
+    Example:
+    >>> try:
+    >>>    cdm = find_exe_by_file_extension('.cdm')
+    >>>    assert 'KOMPAS-3D'in cdm
+    >>> except Exception:
+    >>>    logging.exception('Не удалось найти исполняемый файл')
+    >>>    pass
+    """
+    try:
+        with winreg.OpenKey(
+            winreg.HKEY_CLASSES_ROOT, file_extension, 0, winreg.KEY_READ
+        ) as key:
+            class_name, _ = winreg.QueryValueEx(key, "")
+            command_path = rf"{class_name}\shell\open\command"
+
+            with winreg.OpenKey(
+                winreg.HKEY_CLASSES_ROOT, command_path, 0, winreg.KEY_READ
+            ) as key:
+                command_val, _ = winreg.QueryValueEx(key, "")
+                exe_path = shlex.split(command_val)[0]
+                return exe_path.strip('"')
+
+    except Exception as e:
+        raise Exception(
+            f"Не удалось найти исполняемый файл по расширению {file_extension!r}"
+        ) from e
+
+
+def is_process_running(process_name: str) -> bool:
+    """Проверяет, запущен ли процесс с именем process_name.
+
+    Args:
+        process_name (str): Имя процесса
+
+    Returns:
+        bool: True, если процесс запущен, иначе False
+
+    Example:
+        >>> explorer = is_process_running('explorer.exe')
+        >>> assert explorer != None
+    """
+    for proc in psutil.process_iter(["name"]):
+        if proc.info["name"] == process_name:
+            logging.debug(f"Process {process_name} is running")
+            return True
+
+    logging.debug(f"Process {process_name} is not running")
+    return False
+
+
+class Kompas:
     """Класс для работы с КОМПАС-3D."""
 
     def __init__(self):
@@ -46,35 +105,10 @@ class k3d:
         kompas_document.Active = True
         self.document_2d = self.module7.IKompasDocument2D(kompas_document)
 
-    def find_exe_by_file_extension(self, file_extension: str) -> str:
-        """Находит исполняемый файл по расширению файла."""
-        try:
-            with winreg.OpenKey(
-                winreg.HKEY_CLASSES_ROOT, file_extension, 0, winreg.KEY_READ
-            ) as key:
-                class_name, key_type = winreg.QueryValueEx(key, "")
-
-                if key_type != winreg.REG_SZ:
-                    raise FileNotFoundError(f"Нет ключа {file_extension} в реестре")
-
-            with winreg.OpenKey(
-                winreg.HKEY_CLASSES_ROOT,
-                rf"{class_name}\shell\open\command",
-                0,
-                winreg.KEY_READ,
-            ) as key:
-                command_val, _ = winreg.QueryValueEx(key, "")
-                exe_path = shlex.split(command_val)[0]
-                return exe_path.strip('"')
-        except FileNotFoundError as file_not_found_err:
-            raise FileNotFoundError(
-                f"Не удалось найти исполняемый файл по расширению файла {file_extension!r}"
-            ) from file_not_found_err
-
     def get_pythonwin_path(self) -> str:
         """Возвращает путь к папке pythonwin КОМПАС-3D."""
         file_ext = ".cdm"
-        py_scripter_path = self.find_exe_by_file_extension(file_ext)
+        py_scripter_path = find_exe_by_file_extension(file_ext)
 
         if "Python 3" not in py_scripter_path:
             raise FileNotFoundError("Библиотеки Python КОМПАС-3D не найдены")
@@ -93,7 +127,7 @@ class k3d:
 
     def get_kompas_path(self) -> str:
         """Возвращает путь к исполняемому файлу КОМПАС-3D."""
-        kompas_path = self.find_exe_by_file_extension(".cdw")
+        kompas_path = find_exe_by_file_extension(".cdw")
 
         if "KOMPAS-3D" not in kompas_path:
             raise FileNotFoundError("КОМПАС-3D с поддержкой макросов не установлен")
@@ -108,7 +142,6 @@ class k3d:
         """Импортирует модули LDefin2D и MiscellaneousHelpers из папки pythonwin КОМПАС-3D."""
         if kompas_pythonwin is None:
             kompas_pythonwin = self.get_pythonwin_path()
-        # Проверяем, существует ли папка pythonwin
         if not path.exists(kompas_pythonwin):
             raise FileNotFoundError(
                 f"Kompas pythonwin not found at {kompas_pythonwin!r}. "
@@ -117,40 +150,24 @@ class k3d:
 
         sys.path.append(kompas_pythonwin)
 
-        # Удаляем модули LDefin2D и MiscellaneousHelpers из sys.modules, если они там есть
         sys.modules.pop("MiscellaneousHelpers", None)
         sys.modules.pop("LDefin2D", None)
 
         try:
-            # Импортируем модули LDefin2D и MiscellaneousHelpers как miscHelpers
             import LDefin2D  # pyright: reportMissingImports=false
             import MiscellaneousHelpers as miscHelpers
         except ImportError as import_err:
-            # Если не удалось импортировать модули, то возвращаем исключение
             raise ImportError(f"Failed importing {import_err.name}") from ImportError
         finally:
-            # Убеждаемся, что папка pythonwin удалена из sys.path
             sys.path.remove(kompas_pythonwin)
 
         return LDefin2D, miscHelpers
-
-    def is_process_running(self, process_name: str) -> bool:
-        """Проверяет, запущен ли процесс с именем process_name."""
-        for proc in psutil.process_iter():
-            try:
-                if proc.name() == process_name:
-                    logging.debug(f"Process {process_name} is running")
-                    return True
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
-                pass
-        logging.debug(f"Process {process_name} is not running")
-        return False
 
     def start_kompas(self, kompas_exe_path: str = None) -> bool:
         """Запускает КОМПАС-3D, если он ещё не запущен."""
         if kompas_exe_path is None:
             kompas_exe_path = self.get_kompas_path()
-        if self.is_process_running(path.basename(kompas_exe_path)):
+        if is_process_running(path.basename(kompas_exe_path)):
             return True
 
         try:
@@ -218,4 +235,4 @@ class k3d:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
 
-    kompas = k3d()
+    kompas = Kompas()
