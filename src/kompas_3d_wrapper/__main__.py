@@ -52,7 +52,7 @@ def find_exe_by_file_extension(file_extension: str) -> str:
                 return exe_path.strip('"')
 
     except Exception as e:
-        raise Exception(
+        raise FileNotFoundError(
             f"Не удалось найти исполняемый файл по расширению {file_extension!r}"
         ) from e
 

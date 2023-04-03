@@ -3,8 +3,8 @@ from os import path
 
 import pytest
 
+from kompas_3d_wrapper import Kompas
 from kompas_3d_wrapper import find_exe_by_file_extension
-from kompas_3d_wrapper import get_pythonwin_path
 
 
 def test_find_exe_by_file_extension_success():
@@ -21,7 +21,8 @@ def test_find_exe_by_file_extension_nonexistent_extension_error():
 
 def test_get_pythonwin():
     """Проверка получения пути к pythonwin."""
+    kompas = Kompas()
     cdm = find_exe_by_file_extension(".cdm")
     cdm = cdm.replace(path.basename(cdm), "")
-    pythonwin = get_pythonwin_path()
+    pythonwin = kompas.get_pythonwin_path()
     assert path.basename(cdm) in pythonwin
